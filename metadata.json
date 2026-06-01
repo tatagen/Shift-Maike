@@ -1,0 +1,8 @@
+{
+  "name": "ShiftFlow AI",
+  "description": "Mechanical AI-driven shift scheduling for hotels with strict labor rules and customized shift patterns.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

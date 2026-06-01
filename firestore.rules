@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // -------------------------------------------------------------------------
+    // GLOBALS
+    // -------------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      // Bootstrap with email for the first user or explicitly check role
+      return isSignedIn() && (
+        request.auth.token.email == "aikyo.tech@gmail.com" ||
+        getUserData().role == "ADMIN"
+      );
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // -------------------------------------------------------------------------
+    // COLLECTIONS
+    // -------------------------------------------------------------------------
+
+    // USERS
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && (
+        isOwner(userId) || isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // SHIFT PATTERNS
+    match /shift_patterns/{patternId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // REQUIREMENTS
+    match /requirements/{reqId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // PAIR RESTRICTIONS
+    match /pair_restrictions/{resId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // SUBMISSIONS
+    match /submissions/{subId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // SCHEDULES
+    match /schedules/{schId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

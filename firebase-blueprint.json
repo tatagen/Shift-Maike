@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Staff or Admin user profile",
+      "type": "object",
+      "properties": {
+        "hotelId": { "type": "string" },
+        "role": { "type": "string", "enum": ["ADMIN", "STAFF"] },
+        "name": { "type": "string" },
+        "maxHoursPerMonth": { "type": "number" },
+        "preferredStyle": { "type": "string", "enum": ["DEFAULT", "DAY_MAIN", "NIGHT_MAIN"] }
+      },
+      "required": ["hotelId", "role", "name"]
+    },
+    "ShiftPattern": {
+      "title": "ShiftPattern",
+      "description": "Defined shift types for a hotel",
+      "type": "object",
+      "properties": {
+        "hotelId": { "type": "string" },
+        "name": { "type": "string" },
+        "shortName": { "type": "string" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "workHours": { "type": "number" }
+      },
+      "required": ["hotelId", "name", "shortName", "startTime", "endTime", "workHours"]
+    },
+    "Requirement": {
+      "title": "Requirement",
+      "description": "Daily staffing requirements",
+      "type": "object",
+      "properties": {
+        "hotelId": { "type": "string" },
+        "date": { "type": "string" },
+        "patternId": { "type": "string" },
+        "count": { "type": "number" }
+      },
+      "required": ["hotelId", "date", "patternId", "count"]
+    },
+    "PairRestriction": {
+      "title": "PairRestriction",
+      "description": "Forbidden staff pairings",
+      "type": "object",
+      "properties": {
+        "hotelId": { "type": "string" },
+        "staffId1": { "type": "string" },
+        "staffId2": { "type": "string" },
+        "type": { "type": "string", "enum": ["FORBIDDEN"] }
+      },
+      "required": ["hotelId", "staffId1", "staffId2", "type"]
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "Staff shift requests",
+      "type": "object",
+      "properties": {
+        "hotelId": { "type": "string" },
+        "userId": { "type": "string" },
+        "yearMonth": { "type": "string" },
+        "offDates": { "type": "array", "items": { "type": "string" } },
+        "specificRequests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string" },
+              "patternId": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["hotelId", "userId", "yearMonth"]
+    },
+    "Schedule": {
+      "title": "Schedule",
+      "description": "The generated schedule outcome",
+      "type": "object",
+      "properties": {
+        "hotelId": { "type": "string" },
+        "yearMonth": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string" },
+              "userId": { "type": "string" },
+              "patternId": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["hotelId", "yearMonth", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/shift_patterns/{patternId}": { "schema": "ShiftPattern", "description": "Master shift patterns" },
+    "/requirements/{reqId}": { "schema": "Requirement", "description": "Staffing requirements" },
+    "/pair_restrictions/{resId}": { "schema": "PairRestriction", "description": "NG Pair settings" },
+    "/submissions/{subId}": { "schema": "Submission", "description": "Staff submissions" },
+    "/schedules/{schId}": { "schema": "Schedule", "description": "Produced schedules" }
+  }
+}
