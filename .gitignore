@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Firebase設定（実際のAPIキーを含むため除外）
+firebase-applet-config.json
