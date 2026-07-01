@@ -19,7 +19,7 @@
 |------|------|
 | フロントエンド | React 19 / TypeScript |
 | スタイリング | Tailwind CSS 4 |
-| データ | Firebase Firestore |
+| データ | localStorage（サーバー不要） |
 | AI | Gemini API（シフト最適化） |
 | ビルド | Vite 6 |
 | デプロイ | Cloudflare Pages |
@@ -29,8 +29,17 @@
 ```bash
 git clone https://github.com/tatagen/Shift-Maike.git
 cd Shift-Maike
-cp firebase-applet-config.example.json firebase-applet-config.json
-# firebase-applet-config.json にFirebaseプロジェクト情報を入力
 npm install
 npm run dev
 ```
+
+> データはブラウザの localStorage に保存されます。環境変数・外部サービスの設定は不要です。
+> AIシフト生成機能を使う場合は `.env` に `GEMINI_API_KEY` を設定してください。
+
+## 🚀 デプロイ（Cloudflare Pages）
+
+| 設定 | 値 |
+|------|----|
+| ビルドコマンド | `npm run build` |
+| 出力ディレクトリ | `dist` |
+| 環境変数（AI機能用） | `GEMINI_API_KEY` |
